@@ -36,5 +36,5 @@ Variable types are inferred from how each variable is used; one that holds both 
 - **Extension blocks other than pen** (music, video, text to speech, ...) and a few rarely used blocks become `// unsupported: <opcode>` comments.
 - **Unknown hat blocks** (like *when touching*) keep their script as a function that nothing calls.
 - **Loose blocks** that aren't under a hat are dropped (they never run).
-- **Clean-up**: block positions, variable monitors on the stage, and the exact shape of some blocks (e.g. `Math.round` of a mod) are rebuilt by the compiler, so the blocks you get back look a little different but behave the same.
+- **Clean-up**: block positions and the exact shape of some blocks (e.g. `Math.round` of a mod) are rebuilt by the compiler, so the blocks you get back look a little different but behave the same. Variable monitors (position, slider range, visibility, slider mode) are now preserved.
 - Projects made with TextToScratch convert too, but constants are inlined, `cond ? a : b` shows up as an `if` into a temporary variable, and function return values show up as the hidden `__ret` variable.
