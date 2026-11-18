@@ -3,7 +3,7 @@ import { Arg, HATS, MATHOP, PROPS, REPORT, SHADOW, Slot, Spec, STACK } from "./a
 
 /** code: set on TypeScript type errors (editors show those already), unset on TextToScratch compile errors */
 export interface Diag { file: string; line: number; col: number; message: string; code?: number }
-export interface VarInfo { name: string; id: string; list: boolean; value: any; global: boolean; cloud?: boolean }
+export interface VarInfo { name: string; id: string; list: boolean; value: any; global: boolean; cloud?: boolean; monitor?: { x: number; y: number; sliderMin: number; sliderMax: number; visible?: boolean; slider?: boolean } }
 /** An object created with `new` at the top level: fields are variables, methods are compiled per object. */
 interface Instance { name: string; cls: ts.ClassDeclaration; fields: Map<string, VarInfo>; global: boolean }
 type FnDecl = ts.FunctionDeclaration | ts.MethodDeclaration;
@@ -782,6 +782,19 @@ export class Target {
       if (name === "showVariable" || name === "hideVariable") {
         const v = this.varRef(args[0]);
         this.monitored.add(v);
+        if (name === "showVariable" && args[1] && ts.isObjectLiteralExpression(args[1])) {
+          const o: any = {};
+          for (const p of args[1].properties) {
+            if (ts.isPropertyAssignment(p) && ts.isIdentifier(p.name)) {
+              const key = p.name.text;
+              const init = p.initializer;
+              if (ts.isNumericLiteral(init)) o[key] = Number(init.text);
+              if (init.kind === ts.SyntaxKind.TrueKeyword) o[key] = true;
+              if (init.kind === ts.SyntaxKind.FalseKeyword) o[key] = false;
+            }
+          }
+          v.monitor = { x: o.x ?? 5, y: o.y ?? 5, sliderMin: o.sliderMin ?? 0, sliderMax: o.sliderMax ?? 100, visible: o.visible, slider: o.slider };
+        }
         const op = `data_${name === "showVariable" ? "show" : "hide"}${v.list ? "list" : "variable"}`;
         return [this.mk(op, { f: v.list ? { LIST: [v.name, v.id] } : { VARIABLE: [v.name, v.id] } })];
       }

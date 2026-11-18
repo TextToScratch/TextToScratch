@@ -177,11 +177,13 @@ export function build(input: BuildInput, libs: Libs): BuildResult {
   for (const t of targets)
     for (const v of t.monitored) {
       if (json.monitors.some((m: any) => m.id === v.id)) continue;
+      const m = (v as any).monitor ?? {};
+      const slider = m.slider ?? (m.sliderMin !== undefined || m.sliderMax !== undefined);
       json.monitors.push({
-        id: v.id, mode: v.list ? "list" : "default", opcode: v.list ? "data_listcontents" : "data_variable",
+        id: v.id, mode: v.list ? "list" : (slider ? "slider" : "default"), opcode: v.list ? "data_listcontents" : "data_variable",
         params: v.list ? { LIST: v.name } : { VARIABLE: v.name }, spriteName: v.global ? null : t.name,
-        value: v.list ? [] : 0, width: 0, height: 0, x: 5, y: 5 + 27 * json.monitors.length, visible: false,
-        sliderMin: 0, sliderMax: 100, isDiscrete: true,
+        value: v.list ? [] : 0, width: 0, height: 0, x: m.x ?? 5, y: m.y ?? (5 + 27 * json.monitors.length), visible: m.visible ?? false,
+        sliderMin: m.sliderMin ?? 0, sliderMax: m.sliderMax ?? 100, isDiscrete: true,
       });
     }
   json.meta = { ...json.meta, agent: "TextToScratch" };

@@ -504,7 +504,15 @@ class Dec {
       }
       case "data_showvariable": case "data_hidevariable": case "data_showlist": case "data_hidelist": {
         const v = this.varOf(op.endsWith("list") ? b.fields?.LIST : b.fields?.VARIABLE, op.endsWith("list"));
-        return [L(`${op.includes("show") ? "showVariable" : "hideVariable"}(${this.ref(v)});`)];
+        let extra = "";
+        if (op.includes("show")) {
+          const mon = (this.p.json?.monitors ?? []).find((m: any) => m.params?.VARIABLE === v.name || m.params?.LIST === v.name);
+          if (mon) {
+            const parts = [`x: ${mon.x}`, `y: ${mon.y}`, `sliderMin: ${mon.sliderMin}`, `sliderMax: ${mon.sliderMax}`, `visible: ${!!mon.visible}`, `slider: ${mon.mode === "slider"}`];
+            extra = `, { ${parts.join(", ")} }`;
+          }
+        }
+        return [L(`${op.includes("show") ? "showVariable" : "hideVariable"}(${this.ref(v)}${extra});`)];
       }
       case "data_addtolist": case "data_insertatlist": case "data_replaceitemoflist": case "data_deleteoflist": case "data_deletealloflist": {
         const v = this.varOf(b.fields?.LIST, true);
