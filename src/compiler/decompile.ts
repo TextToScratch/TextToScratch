@@ -506,7 +506,10 @@ class Dec {
         const v = this.varOf(op.endsWith("list") ? b.fields?.LIST : b.fields?.VARIABLE, op.endsWith("list"));
         let extra = "";
         if (op.includes("show")) {
-          const mon = (this.p.json?.monitors ?? []).find((m: any) => m.params?.VARIABLE === v.name || m.params?.LIST === v.name);
+          const mon = (this.p.json?.monitors ?? []).find((m: any) => {
+            const mv = m.params?.VARIABLE ?? m.params?.LIST;
+            return mv === v.name || (typeof mv === "string" && mv.split(/\s/)[0] === v.name);
+          });
           if (mon) {
             const parts = [`x: ${mon.x}`, `y: ${mon.y}`, `sliderMin: ${mon.sliderMin}`, `sliderMax: ${mon.sliderMax}`, `visible: ${!!mon.visible}`, `slider: ${mon.mode === "slider"}`];
             extra = `, { ${parts.join(", ")} }`;
