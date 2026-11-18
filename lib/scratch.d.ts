@@ -174,7 +174,7 @@ declare function atan(x: number): number;
 
 // ---------- variables / lists ----------
 /** show variable / list monitor on the stage, e.g. `showVariable(game.score)` */
-declare function showVariable(variable: Value | Value[]): void;
+declare function showVariable(variable: Value | Value[], monitor?: { x?: number; y?: number; sliderMin?: number; sliderMax?: number; visible?: boolean; slider?: boolean }): void;
 /** hide variable / list monitor */
 declare function hideVariable(variable: Value | Value[]): void;
 interface Array<T> {
